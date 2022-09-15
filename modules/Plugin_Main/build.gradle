@@ -1,0 +1,6 @@
+apply from: "../../common.gradle"
+
+dependencies {
+    api fileTree(include: ['*.jar'], dir: 'libs')
+    implementation project(':modules:Base')
+}

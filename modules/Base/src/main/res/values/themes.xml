@@ -1,0 +1,30 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Theme -->
+    <style name="DefaultTheme" parent="Theme.AppCompat">
+        <!-- Base application theme. -->
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowAnimationStyle">@style/FadeInOut</item>
+        <item name="android:navigationBarColor" tools:targetApi="21">@android:color/transparent</item>
+    </style>
+
+
+    <style name="DefaultTheme.White" parent="DefaultTheme">
+        <!-- 应用端背景为白色 -->
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowContentOverlay">@color/white</item>
+    </style>
+
+    <style name="DefaultTheme.Transparent" parent="DefaultTheme">
+        <!-- 弹窗背景为透明 -->
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@color/transparent</item>
+    </style>
+</resources>

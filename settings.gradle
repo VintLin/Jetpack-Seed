@@ -1,0 +1,3 @@
+include ':app'
+include ':modules:Base'                          //基础插件
+include ':modules:Plugin_Main'

@@ -1,0 +1,11 @@
+def addRepos(RepositoryHandler handler) {
+    handler.maven { url 'https://jitpack.io' }
+    handler.mavenCentral()
+    handler.google()
+    handler.jcenter()
+    handler.flatDir {
+        dirs 'libs','../../localSDK','../localSDK','../../dev_aar','../dev_aar'
+    }
+}
+
+ext.addRepos = this.&addRepos

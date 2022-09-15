@@ -1,0 +1,66 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion setup.compileSdk
+
+    defaultConfig {
+        minSdkVersion setup.minSdk
+        targetSdkVersion setup.targetSdk
+        versionCode release.versionCode
+        versionName release.versionName
+
+        multiDexEnabled true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), '../../app/proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildFeatures {
+        dataBinding true
+    }
+}
+dependencies {
+    api fileTree(include: ['*.jar'], dir: 'libs')
+
+    api "$library.androidx_activity"
+    api "$library.androidx_fragment"
+    api "$library.androidx_legacy"
+    api "$library.androidx_multidex"
+    api "$library.androidx_appcompat"
+    api "$library.androidx_recyclerview"
+    api "$library.androidx_constraintlayout"
+    api "$library.androidx_core"
+    api "$library.androidx_core_ktx"
+    api "$library.androidx_activity_ktx"
+    api "$library.androidx_fragment_ktx"
+    api "$library.androidx_viewmodel_ktx"
+    api "$library.androidx_livedata_ktx"
+
+    api "$library.jetpack_runtime"
+    api "$library.jetpack_common"
+    api "$library.jetpack_viewmodel"
+    api "$library.jetpack_livedata"
+    api "$library.navigation_runtime"
+    api "$library.navigation_fragment"
+    api "$library.databinding"
+    api "$library.picker_view"
+    api "$library.viewpager2"
+
+    api "$library.mmkv"
+    api "$library.autosize"
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
