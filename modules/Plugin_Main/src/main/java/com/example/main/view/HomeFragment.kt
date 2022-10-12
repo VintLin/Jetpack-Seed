@@ -11,10 +11,9 @@ import com.example.base.jetpack.binding.DataBindingConfig
 import com.example.base.util.once.Once
 import com.example.main.BR
 import com.example.main.R
-import com.example.main.bean.DemoItem
-import com.example.main.bean.DemoUtils
+import com.example.main.view.bean.DemoItem
+import com.example.main.view.bean.DemoUtils
 import com.example.main.grid.bean.GirdViewAction
-import com.example.main.grid.bean.GirdViewConfig
 import com.example.main.grid.bean.ItemSize
 import com.example.main.grid.core.BaseAdapter
 import com.example.main.grid.impl.GridRecyclerView

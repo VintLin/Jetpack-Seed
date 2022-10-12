@@ -73,78 +73,38 @@ abstract class BaseAdapter : RecyclerView.Adapter<BaseAdapter.BaseViewHolder>(),
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         Log.d(TAG, "onBindViewHolder($position)")
-        if (requestGirdViewConfig().isHorizontal) {
-            onBindHViewHolder(holder, position)
-        } else {
-            onBindVViewHolder(holder, position)
-        }
-    }
-
-    private fun onBindHViewHolder(holder: BaseViewHolder, position: Int) {
         val line: LineInfo = lines[position] ?: return
         val items: ArrayList<ItemInfo> = ArrayList(line.getItems())
         val layout: LinearLayout = initLinearLayout(holder.getItemView())
         var splitCount = 0
         var itemIndex = 0
         var lineWidth = line.getWidth()
+        var lineHeight = line.getHeight()
+        val isHorizontal = requestGirdViewConfig().isHorizontal
         while (items.isNotEmpty() && splitCount < requestGirdViewConfig().splitCount) {
             val currentItem: ItemInfo = items[itemIndex]
-            if (lineWidth < currentItem.getSize().width || lineWidth == 0) {
+            if (isHorizontal && lineWidth == 0 || !isHorizontal && lineHeight == 0) {
                 splitCount++
                 itemIndex = 0
                 lineWidth = line.getWidth()
-                // No more space in this column. Move to next one
-            }
-            // Is there enough space in this column to accommodate currentItem?
-            if (lineWidth >= currentItem.getSize().width) {
-                items.remove(currentItem)
-                val actualIndex = currentItem.getIndex()
-                val viewType: Int = getItemViewType(actualIndex)
-                var pool: ObjectPool<ItemViewHolder>? = holders[viewType]
-                if (pool == null) {
-                    pool = ObjectPool()
-                    holders[viewType] = pool
-                }
-                var viewHolder = pool.get()
-                if (viewHolder == null) {
-                    viewHolder = onCreateItemViewHolder(holder.getItemView(), viewType, actualIndex)
-                }
-                onBindItemViewHolder(holder.getItemView(), viewHolder, actualIndex)
-                val view = viewHolder.itemView
-                view.tag = ViewState(viewType, currentItem, viewHolder)
-                view.setOnClickListener(this)
-                view.setOnLongClickListener(this)
-                lineWidth -= currentItem.getSize().width
-                itemIndex = 0
-                view.layoutParams = LinearLayout.LayoutParams(
-                    getWidth(currentItem.getSize()),
-                    getHeight(currentItem.getSize())
-                )
-                val childLayout: LinearLayout = findLinearLayout(layout, splitCount)
-                childLayout.addView(view)
-            } else {
-                break
-            }
-        }
-    }
-
-    private fun onBindVViewHolder(holder: BaseViewHolder, position: Int) {
-        val line: LineInfo = lines[position] ?: return
-        val items: ArrayList<ItemInfo> = ArrayList(line.getItems())
-        val layout: LinearLayout = initLinearLayout(holder.getItemView())
-        var splitCount = 0
-        var itemIndex = 0
-        var lineHeight = line.getHeight()
-        while (items.isNotEmpty() && splitCount < requestGirdViewConfig().splitCount) {
-            val currentItem: ItemInfo = items[itemIndex]
-            if (lineHeight < currentItem.getSize().height || lineHeight == 0) {
-                splitCount++
-                itemIndex = 0
                 lineHeight = line.getHeight()
                 // No more space in this column. Move to next one
+                continue
             }
             // Is there enough space in this column to accommodate currentItem?
-            if (lineHeight >= currentItem.getSize().height) {
+            val isBind = if (isHorizontal) {
+                lineWidth >= currentItem.getSize().width
+            } else {
+                lineHeight >= currentItem.getSize().height
+            }
+            if (!isBind && splitCount < requestGirdViewConfig().splitCount && items.size == 1) {
+                splitCount++
+                itemIndex = 0
+                lineWidth = line.getWidth()
+                lineHeight = line.getHeight()
+                continue
+            }
+            if (isBind) {
                 items.remove(currentItem)
                 val actualIndex = currentItem.getIndex()
                 val viewType: Int = getItemViewType(actualIndex)
@@ -162,7 +122,11 @@ abstract class BaseAdapter : RecyclerView.Adapter<BaseAdapter.BaseViewHolder>(),
                 view.tag = ViewState(viewType, currentItem, viewHolder)
                 view.setOnClickListener(this)
                 view.setOnLongClickListener(this)
-                lineHeight -= currentItem.getSize().height
+                if (isHorizontal) {
+                    lineWidth -= currentItem.getSize().width
+                } else {
+                    lineHeight -= currentItem.getSize().height
+                }
                 itemIndex = 0
                 view.layoutParams = LinearLayout.LayoutParams(
                     getWidth(currentItem.getSize()),
@@ -170,6 +134,8 @@ abstract class BaseAdapter : RecyclerView.Adapter<BaseAdapter.BaseViewHolder>(),
                 )
                 val childLayout: LinearLayout = findLinearLayout(layout, splitCount)
                 childLayout.addView(view)
+            } else if (itemIndex < items.size - 1) {
+                itemIndex++
             } else {
                 break
             }
@@ -207,6 +173,7 @@ abstract class BaseAdapter : RecyclerView.Adapter<BaseAdapter.BaseViewHolder>(),
         layout.removeAllViews()
         layout.dividerDrawable = GradientDrawable().apply {
             setSize(requestGirdViewConfig().spaceWidth.toInt(), requestGirdViewConfig().spaceWidth.toInt())
+            setColor(Color.YELLOW)
         }
         if (requestGirdViewConfig().isHorizontal) {
             layout.orientation = LinearLayout.VERTICAL
@@ -304,8 +271,10 @@ abstract class BaseAdapter : RecyclerView.Adapter<BaseAdapter.BaseViewHolder>(),
                 }
             }
             return if (requestGirdViewConfig().isHorizontal) {
+                OrientationHandler.HORIZONTAL.setReordering(requestGirdViewConfig().isReordering)
                 OrientationHandler.HORIZONTAL.calculateLines(cache, requestGirdViewConfig().splitCount)
             } else {
+                OrientationHandler.VERTICAL.setReordering(requestGirdViewConfig().isReordering)
                 OrientationHandler.VERTICAL.calculateLines(cache, requestGirdViewConfig().splitCount)
             }
         }

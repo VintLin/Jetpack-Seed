@@ -1,6 +1,5 @@
 package com.example.main.grid.core
 
-import android.util.Log
 import com.example.main.grid.bean.ItemInfo
 import com.example.main.grid.bean.LineInfo
 
@@ -40,7 +39,7 @@ interface OrientationHandler {
                 var maxWidth = 1
                 var maxArea = maxExtent * maxWidth
                 while (0 < maxArea && currentIndex < items.size) {
-                    val item = items[currentIndex]
+                    val item = items[currentIndex++]
                     val itemArea = item.getSize().height * item.getSize().width
                     if (maxWidth < item.getSize().width) {
                         // restart with double height
@@ -48,45 +47,44 @@ interface OrientationHandler {
                         maxWidth = item.getSize().width
                         currentIndex = 0
                         maxArea = maxExtent * item.getSize().width
-                    } else if (maxArea >= itemArea) {
-                        val info = calculateWidth(currentIndex, items, maxWidth)
-                        maxArea -= info.getArea()
-                        currentIndex += info.getItems().size
-                        fitItems.addAll(info.getItems())
-                    } else if (!isReordering()) {
-                        break
-                    }
-                }
-                Log.e("TAGTAG", "size: (${fitItems.size}) width: $maxExtent")
-                return LineInfo(maxWidth, maxExtent, fitItems)
-            }
-
-            private fun calculateWidth(index: Int, items: List<ItemInfo>, maxExtent: Int): LineInfo {
-                val fitItems: MutableList<ItemInfo> = mutableListOf()
-                var currentIndex = index
-                val maxHeight = items[index].getSize().height
-                var maxArea = maxHeight * maxExtent
-                var currentWidth = 0
-                while (0 < maxArea && currentIndex < items.size) {
-                    val item = items[currentIndex++]
-                    val itemArea = item.getSize().height * item.getSize().width
-                    currentWidth += item.getSize().width
-                    Log.e("TAGTAG", "item: (${item.getSize()}) width: $currentWidth height: $maxHeight ${item.getSize().height}")
-                    if (maxHeight < item.getSize().height || maxExtent < currentWidth) {
-                        break;
-                    } else if (maxArea >= itemArea) {
+                    } else if (maxArea >= itemArea && isAdd(item, fitItems, maxWidth, maxExtent)) {
                         maxArea -= itemArea
-                        Log.e("TAGTAG", "add item: (${item.getSize()})")
                         fitItems.add(item)
                     } else if (!isReordering()) {
                         break
                     }
                 }
-                Log.e("TAGTAG", "=====")
-                return LineInfo(maxExtent, maxHeight, fitItems)
+                return LineInfo(maxWidth, maxExtent, fitItems)
             }
 
-
+            override fun isAdd(addItem: ItemInfo, items: List<ItemInfo>, maxWidth: Int, maxHeight: Int): Boolean {
+                var currentWidth = 0
+                var currentHeight = 0
+                var maxItemHeight = 0
+                for (index in 0 until items.size + 1) {
+                    var itemWidth: Int
+                    var itemHeight: Int
+                    if (index == items.size) {
+                        itemWidth = addItem.getSize().width
+                        itemHeight = addItem.getSize().height
+                    } else {
+                        itemWidth = items[index].getSize().width
+                        itemHeight = items[index].getSize().height
+                    }
+                    if (maxItemHeight == 0) maxItemHeight = itemHeight
+                    if (currentWidth + itemWidth < maxWidth && index != items.size) {
+                        currentWidth += itemWidth
+                        if (maxItemHeight < itemHeight) {
+                            maxItemHeight = itemHeight
+                        }
+                    } else {
+                        currentHeight += maxItemHeight
+                        maxItemHeight = 0
+                        currentWidth = 0
+                    }
+                }
+                return currentHeight <= maxHeight;
+            }
         }
 
         val VERTICAL = object : OrientationHandler {
@@ -122,7 +120,7 @@ interface OrientationHandler {
                 var maxHeight = 1
                 var maxArea = maxExtent * maxHeight
                 while (0 < maxArea && currentIndex < items.size) {
-                    val item = items[currentIndex]
+                    val item = items[currentIndex++]
                     val itemArea = item.getSize().height * item.getSize().width
                     if (maxHeight < item.getSize().height) {
                         // restart with double height
@@ -130,11 +128,9 @@ interface OrientationHandler {
                         maxHeight = item.getSize().height
                         currentIndex = 0
                         maxArea = maxExtent * item.getSize().height
-                    } else if (maxArea >= itemArea) {
-                        val info = calculateHeight(currentIndex, items, maxHeight)
-                        maxArea -= info.getArea()
-                        currentIndex += info.getItems().size
-                        fitItems.addAll(info.getItems())
+                    } else if (maxArea >= itemArea && isAdd(item, fitItems, maxExtent, maxHeight)) {
+                        maxArea -= itemArea
+                        fitItems.add(item)
                     } else if (!isReordering()) {
                         break
                     }
@@ -142,26 +138,33 @@ interface OrientationHandler {
                 return LineInfo(maxExtent, maxHeight, fitItems)
             }
 
-            private fun calculateHeight(index: Int, items: List<ItemInfo>, maxHeight: Int): LineInfo {
-                val fitItems: MutableList<ItemInfo> = mutableListOf()
-                var currentIndex = index
-                val maxWidth = items[index].getSize().width
-                var maxArea = maxWidth * maxHeight
+            override fun isAdd(addItem: ItemInfo, items: List<ItemInfo>, maxWidth: Int, maxHeight: Int): Boolean {
+                var currentWidth = 0
                 var currentHeight = 0
-                while (0 < maxArea && currentIndex < items.size) {
-                    val item = items[currentIndex++]
-                    val itemArea = item.getSize().height * item.getSize().width
-                    currentHeight += item.getSize().height
-                    if (maxWidth < item.getSize().width || maxHeight < currentHeight) {
-                        break;
-                    } else if (maxArea >= itemArea) {
-                        maxArea -= itemArea
-                        fitItems.add(item)
-                    } else if (!isReordering()) {
-                        break
+                var maxItemWidth = 0
+                for (index in 0 until items.size + 1) {
+                    var itemWidth: Int
+                    var itemHeight: Int
+                    if (index == items.size) {
+                        itemWidth = addItem.getSize().width
+                        itemHeight = addItem.getSize().height
+                    } else {
+                        itemWidth = items[index].getSize().width
+                        itemHeight = items[index].getSize().height
+                    }
+                    if (maxItemWidth == 0) maxItemWidth = itemWidth
+                    if (currentHeight + itemHeight < maxHeight && index != items.size) {
+                        currentHeight += itemHeight
+                        if (maxItemWidth < itemWidth) {
+                            maxItemWidth = itemWidth
+                        }
+                    } else {
+                        currentWidth += maxItemWidth
+                        maxItemWidth = 0
+                        currentHeight = 0
                     }
                 }
-                return LineInfo(maxWidth, maxHeight, fitItems)
+                return currentWidth <= maxWidth;
             }
         }
     }
@@ -169,6 +172,8 @@ interface OrientationHandler {
     fun setReordering(state: Boolean)
 
     fun isReordering(): Boolean
+
+    fun isAdd(addItem: ItemInfo, items: List<ItemInfo>, maxWidth: Int, maxHeight: Int): Boolean
 
     fun calculateLines(cache: MutableList<ItemInfo>, splitCount: Int): List<LineInfo>
 

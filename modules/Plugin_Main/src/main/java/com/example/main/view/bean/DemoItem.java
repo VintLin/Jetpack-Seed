@@ -1,4 +1,4 @@
-package com.example.main.bean;
+package com.example.main.view.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -8,17 +8,17 @@ import androidx.annotation.NonNull;
 import com.example.main.grid.bean.ItemSize;
 
 public class DemoItem implements ItemSize {
-    private int columnSpan;
-    private int rowSpan;
+    private int width;
+    private int height;
     private int position;
 
     public DemoItem() {
         this(1, 1, 0);
     }
 
-    public DemoItem(int columnSpan, int rowSpan, int position) {
-        this.columnSpan = columnSpan;
-        this.rowSpan = rowSpan;
+    public DemoItem(int width, int height, int position) {
+        this.width = width;
+        this.height = height;
         this.position = position;
     }
 
@@ -29,12 +29,12 @@ public class DemoItem implements ItemSize {
 
     @Override
     public int getHeight() {
-        return rowSpan;
+        return height;
     }
 
     @Override
     public int getWidth() {
-        return columnSpan;
+        return width;
     }
 
     public int getPosition() {
@@ -43,7 +43,7 @@ public class DemoItem implements ItemSize {
 
     @Override
     public String toString() {
-        return String.format("%s: %sx%s", position, rowSpan, columnSpan);
+        return String.format("%s: %sx%s", position, height, width);
     }
 
     @Override
@@ -52,15 +52,15 @@ public class DemoItem implements ItemSize {
     }
 
     private void readFromParcel(Parcel in) {
-        columnSpan = in.readInt();
-        rowSpan = in.readInt();
+        width = in.readInt();
+        height = in.readInt();
         position = in.readInt();
     }
 
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeInt(columnSpan);
-        dest.writeInt(rowSpan);
+        dest.writeInt(width);
+        dest.writeInt(height);
         dest.writeInt(position);
     }
 
