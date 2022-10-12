@@ -3,6 +3,8 @@ package com.example.main.view.bean;
 import java.util.ArrayList;
 import java.util.List;
 
+import kotlin.random.Random;
+
 public final class DemoUtils {
     int currentOffset;
 
@@ -23,6 +25,7 @@ public final class DemoUtils {
         items.add(new DemoItem(1, 1, 9));
         return items;
     }
+
     public List<DemoItem> standOneItems() {
         List<DemoItem> items = new ArrayList<>();
         items.add(new DemoItem(1, 1, 0));
@@ -71,16 +74,13 @@ public final class DemoUtils {
         return items;
     }
 
-    public List<DemoItem> moarItems(int qty) {
+    public List<DemoItem> randomItems(int qty) {
         List<DemoItem> items = new ArrayList<>();
 
         for (int i = 0; i < qty; i++) {
-            int colSpan = Math.random() < 0.2f ? 2 : 1;
-            // Swap the next 2 lines to have items with variable
-            // column/row span.
-            // int rowSpan = Math.random() < 0.2f ? 2 : 1;
-            int rowSpan = Math.random() < 0.2f ? 2 : 1;;
-            DemoItem item = new DemoItem(colSpan, rowSpan, currentOffset + i);
+            int width = Random.Default.nextInt(1, 3);
+            int height = Random.Default.nextInt(1, 3);
+            DemoItem item = new DemoItem(width, height, currentOffset + i);
             items.add(item);
         }
 
