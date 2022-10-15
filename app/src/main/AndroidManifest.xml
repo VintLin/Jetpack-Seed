@@ -21,7 +21,7 @@
             android:name=".SplashActivity"
             android:exported="true"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="sensor"
             android:theme="@style/Theme.AppCompat">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

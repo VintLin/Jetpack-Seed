@@ -1,28 +1,28 @@
-package com.example.main.view.bean;
+package com.example.main.view.item;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
-import com.example.main.grid.bean.ItemSize;
+import com.example.main.grid.bean.GridItemSize;
 
-public class DemoItem implements ItemSize {
+public class ItemData implements GridItemSize {
     private int width;
     private int height;
     private int position;
 
-    public DemoItem() {
+    public ItemData() {
         this(1, 1, 0);
     }
 
-    public DemoItem(int width, int height, int position) {
+    public ItemData(int width, int height, int position) {
         this.width = width;
         this.height = height;
         this.position = position;
     }
 
-    public DemoItem(Parcel in) {
+    public ItemData(Parcel in) {
         readFromParcel(in);
     }
 
@@ -64,17 +64,16 @@ public class DemoItem implements ItemSize {
         dest.writeInt(position);
     }
 
-    /* Parcelable interface implementation */
-    public static final Parcelable.Creator<DemoItem> CREATOR = new Parcelable.Creator<DemoItem>() {
+    public static final Parcelable.Creator<ItemData> CREATOR = new Parcelable.Creator<ItemData>() {
         @Override
-        public DemoItem createFromParcel(@NonNull Parcel in) {
-            return new DemoItem(in);
+        public ItemData createFromParcel(@NonNull Parcel in) {
+            return new ItemData(in);
         }
 
         @Override
         @NonNull
-        public DemoItem[] newArray(int size) {
-            return new DemoItem[size];
+        public ItemData[] newArray(int size) {
+            return new ItemData[size];
         }
     };
 

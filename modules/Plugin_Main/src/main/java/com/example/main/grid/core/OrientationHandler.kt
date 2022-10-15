@@ -1,7 +1,7 @@
 package com.example.main.grid.core
 
-import com.example.main.grid.bean.ItemInfo
-import com.example.main.grid.bean.LineInfo
+import com.example.main.grid.bean.GridItemInfo
+import com.example.main.grid.bean.GridLineInfo
 
 interface OrientationHandler {
 
@@ -17,11 +17,11 @@ interface OrientationHandler {
                 return isReordering
             }
 
-            override fun calculateLines(cache: MutableList<ItemInfo>, splitCount: Int): List<LineInfo> {
-                val lines: MutableList<LineInfo> = mutableListOf()
+            override fun calculateLines(cache: MutableList<GridItemInfo>, splitCount: Int): List<GridLineInfo> {
+                val lines: MutableList<GridLineInfo> = mutableListOf()
                 while (cache.isNotEmpty()) {
-                    val line: LineInfo = calculateLine(cache, splitCount)
-                    val items: List<ItemInfo> = line.getItems()
+                    val line: GridLineInfo = calculateLine(cache, splitCount)
+                    val items: List<GridItemInfo> = line.getItems()
                     if (items.isEmpty()) {
                         break;
                     }
@@ -33,8 +33,8 @@ interface OrientationHandler {
                 return lines
             }
 
-            override fun calculateLine(items: List<ItemInfo>, maxExtent: Int): LineInfo {
-                val fitItems: MutableList<ItemInfo> = mutableListOf()
+            override fun calculateLine(items: List<GridItemInfo>, maxExtent: Int): GridLineInfo {
+                val fitItems: MutableList<GridItemInfo> = mutableListOf()
                 var currentIndex = 0
                 var maxWidth = 1
                 var maxArea = maxExtent * maxWidth
@@ -54,10 +54,10 @@ interface OrientationHandler {
                         break
                     }
                 }
-                return LineInfo(maxWidth, maxExtent, fitItems)
+                return GridLineInfo(maxWidth, maxExtent, fitItems)
             }
 
-            override fun isAdd(addItem: ItemInfo, items: List<ItemInfo>, maxWidth: Int, maxHeight: Int): Boolean {
+            override fun isAdd(addItem: GridItemInfo, items: List<GridItemInfo>, maxWidth: Int, maxHeight: Int): Boolean {
                 var currentWidth = 0
                 var currentHeight = 0
                 var maxItemHeight = 0
@@ -98,11 +98,11 @@ interface OrientationHandler {
                 return isReordering
             }
 
-            override fun calculateLines(cache: MutableList<ItemInfo>, splitCount: Int): List<LineInfo> {
-                val lines: MutableList<LineInfo> = mutableListOf()
+            override fun calculateLines(cache: MutableList<GridItemInfo>, splitCount: Int): List<GridLineInfo> {
+                val lines: MutableList<GridLineInfo> = mutableListOf()
                 while (cache.isNotEmpty()) {
-                    val line: LineInfo = calculateLine(cache, splitCount)
-                    val items: List<ItemInfo> = line.getItems()
+                    val line: GridLineInfo = calculateLine(cache, splitCount)
+                    val items: List<GridItemInfo> = line.getItems()
                     if (items.isEmpty()) {
                         break;
                     }
@@ -114,8 +114,8 @@ interface OrientationHandler {
                 return lines
             }
 
-            override fun calculateLine(items: List<ItemInfo>, maxExtent: Int): LineInfo {
-                val fitItems: MutableList<ItemInfo> = mutableListOf()
+            override fun calculateLine(items: List<GridItemInfo>, maxExtent: Int): GridLineInfo {
+                val fitItems: MutableList<GridItemInfo> = mutableListOf()
                 var currentIndex = 0
                 var maxHeight = 1
                 var maxArea = maxExtent * maxHeight
@@ -135,10 +135,10 @@ interface OrientationHandler {
                         break
                     }
                 }
-                return LineInfo(maxExtent, maxHeight, fitItems)
+                return GridLineInfo(maxExtent, maxHeight, fitItems)
             }
 
-            override fun isAdd(addItem: ItemInfo, items: List<ItemInfo>, maxWidth: Int, maxHeight: Int): Boolean {
+            override fun isAdd(addItem: GridItemInfo, items: List<GridItemInfo>, maxWidth: Int, maxHeight: Int): Boolean {
                 var currentWidth = 0
                 var currentHeight = 0
                 var maxItemWidth = 0
@@ -173,9 +173,9 @@ interface OrientationHandler {
 
     fun isReordering(): Boolean
 
-    fun isAdd(addItem: ItemInfo, items: List<ItemInfo>, maxWidth: Int, maxHeight: Int): Boolean
+    fun isAdd(addItem: GridItemInfo, items: List<GridItemInfo>, maxWidth: Int, maxHeight: Int): Boolean
 
-    fun calculateLines(cache: MutableList<ItemInfo>, splitCount: Int): List<LineInfo>
+    fun calculateLines(cache: MutableList<GridItemInfo>, splitCount: Int): List<GridLineInfo>
 
-    fun calculateLine(items: List<ItemInfo>, maxExtent: Int): LineInfo
+    fun calculateLine(items: List<GridItemInfo>, maxExtent: Int): GridLineInfo
 }

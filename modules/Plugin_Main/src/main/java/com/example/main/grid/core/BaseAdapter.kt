@@ -2,20 +2,20 @@ package com.example.main.grid.core
 
 import android.annotation.SuppressLint
 import android.database.CursorIndexOutOfBoundsException
-import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.AsyncTask
 import android.util.ArrayMap
 import android.util.Log
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.example.main.grid.bean.GirdViewAction
 import com.example.main.grid.bean.*
 import com.example.main.grid.pool.ObjectPool
 import com.example.main.grid.pool.ObjectPoolFactory
+import com.example.main.grid.bean.GridItemInfo
 
 /**
  * 自适应网格布局适配器
@@ -26,7 +26,7 @@ abstract class BaseAdapter : RecyclerView.Adapter<BaseAdapter.BaseViewHolder>(),
         private const val TAG = "BaseAdapter"
     }
 
-    private val lines: MutableMap<Int, LineInfo> = HashMap()
+    private val lines: MutableMap<Int, GridLineInfo> = HashMap()
     private val holders: MutableMap<Int, ObjectPool<ItemViewHolder>> = ArrayMap()
     private var pools: ObjectPool<LinearLayout>? = null
     private var task: ProcessTask? = null
@@ -73,8 +73,8 @@ abstract class BaseAdapter : RecyclerView.Adapter<BaseAdapter.BaseViewHolder>(),
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         Log.d(TAG, "onBindViewHolder($position)")
-        val line: LineInfo = lines[position] ?: return
-        val items: ArrayList<ItemInfo> = ArrayList(line.getItems())
+        val line: GridLineInfo = lines[position] ?: return
+        val items: ArrayList<GridItemInfo> = ArrayList(line.getItems())
         val layout: LinearLayout = initLinearLayout(holder.getItemView())
         var splitCount = 0
         var itemIndex = 0
@@ -82,7 +82,7 @@ abstract class BaseAdapter : RecyclerView.Adapter<BaseAdapter.BaseViewHolder>(),
         var lineHeight = line.getHeight()
         val isHorizontal = requestGirdViewConfig().isHorizontal
         while (items.isNotEmpty() && splitCount < requestGirdViewConfig().splitCount) {
-            val currentItem: ItemInfo = items[itemIndex]
+            val currentItem: GridItemInfo = items[itemIndex]
             if (isHorizontal && lineWidth == 0 || !isHorizontal && lineHeight == 0) {
                 splitCount++
                 itemIndex = 0
@@ -148,7 +148,7 @@ abstract class BaseAdapter : RecyclerView.Adapter<BaseAdapter.BaseViewHolder>(),
         val layout = LinearLayout(context, null)
         layout.showDividers = LinearLayout.SHOW_DIVIDER_MIDDLE
         layout.dividerDrawable = GradientDrawable().apply {
-            setSize(requestGirdViewConfig().spaceWidth.toInt(), ViewGroup.LayoutParams.MATCH_PARENT)
+            setSize(requestGirdViewConfig().spaceWidth, ViewGroup.LayoutParams.MATCH_PARENT)
         }
         val layoutParams = AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT)
         layout.layoutParams = layoutParams
@@ -171,22 +171,27 @@ abstract class BaseAdapter : RecyclerView.Adapter<BaseAdapter.BaseViewHolder>(),
             tempChild.removeAllViews()
         }
         layout.removeAllViews()
-        layout.dividerDrawable = GradientDrawable().apply {
-            setSize(requestGirdViewConfig().spaceWidth.toInt(), requestGirdViewConfig().spaceWidth.toInt())
-            setColor(Color.YELLOW)
-        }
+        layout.clipChildren = false
+        layout.clipToPadding = false
+
         if (requestGirdViewConfig().isHorizontal) {
             layout.orientation = LinearLayout.VERTICAL
             layout.layoutParams = AbsListView.LayoutParams(
                 AbsListView.LayoutParams.WRAP_CONTENT,
                 AbsListView.LayoutParams.MATCH_PARENT
             )
+            layout.dividerDrawable = GradientDrawable().apply {
+                setSize(0, requestGirdViewConfig().spaceWidth)
+            }
         } else {
             layout.orientation = LinearLayout.HORIZONTAL
             layout.layoutParams = AbsListView.LayoutParams(
                 AbsListView.LayoutParams.MATCH_PARENT,
                 AbsListView.LayoutParams.WRAP_CONTENT
             )
+            layout.dividerDrawable = GradientDrawable().apply {
+                setSize(requestGirdViewConfig().spaceWidth, 0)
+            }
         }
         return layout
     }
@@ -196,39 +201,43 @@ abstract class BaseAdapter : RecyclerView.Adapter<BaseAdapter.BaseViewHolder>(),
         if (childLayout == null) {
             childLayout = pools?.get()!!
             childLayout.showDividers = LinearLayout.SHOW_DIVIDER_MIDDLE
-            childLayout.dividerDrawable = GradientDrawable().apply {
-                setSize(requestGirdViewConfig().spaceWidth.toInt(), requestGirdViewConfig().spaceWidth.toInt())
-                setColor(Color.BLUE)
-            }
+            childLayout.clipChildren = false
+            childLayout.clipToPadding = false
             if (requestGirdViewConfig().isHorizontal) {
                 childLayout.orientation = LinearLayout.HORIZONTAL
                 childLayout.layoutParams = AbsListView.LayoutParams(
                     AbsListView.LayoutParams.MATCH_PARENT,
                     AbsListView.LayoutParams.WRAP_CONTENT
                 )
+                childLayout.dividerDrawable = GradientDrawable().apply {
+                    setSize(requestGirdViewConfig().spaceWidth, 0)
+                }
             } else {
                 childLayout.orientation = LinearLayout.VERTICAL
                 childLayout.layoutParams = AbsListView.LayoutParams(
                     AbsListView.LayoutParams.WRAP_CONTENT,
                     AbsListView.LayoutParams.MATCH_PARENT
                 )
+                childLayout.dividerDrawable = GradientDrawable().apply {
+                    setSize(0, requestGirdViewConfig().spaceWidth)
+                }
             }
             parent.addView(childLayout)
         }
         return childLayout
     }
 
-    private fun getHeight(item: ItemSize): Int {
+    private fun getHeight(item: GridItemSize): Int {
         val boxExtent: Int = requestGirdViewConfig().boxWidth * item.height
-        val boxSpace: Int = (requestGirdViewConfig().spaceWidth * (item.height - 1)).toInt()
+        val boxSpace: Int = requestGirdViewConfig().spaceWidth * (item.height - 1)
         // when the item spans multiple rows, we need to account for the vertical padding
         // and add that to the total final height
         return boxExtent + boxSpace
     }
 
-    private fun getWidth(item: ItemSize): Int {
+    private fun getWidth(item: GridItemSize): Int {
         val boxExtent: Int = requestGirdViewConfig().boxWidth * item.width
-        val boxSpace: Int = (requestGirdViewConfig().spaceWidth * (item.width - 1)).toInt()
+        val boxSpace: Int = requestGirdViewConfig().spaceWidth * (item.width - 1)
         // when the item spans multiple columns, we need to account for the horizontal padding
         // and add that to the total final width
         return boxExtent + boxSpace
@@ -240,7 +249,7 @@ abstract class BaseAdapter : RecyclerView.Adapter<BaseAdapter.BaseViewHolder>(),
 
     abstract fun getRealItemCount(): Int
 
-    abstract fun getItem(position: Int): ItemSize
+    abstract fun getItem(position: Int): GridItemSize
 
     abstract fun onCreateItemViewHolder(parent: ViewGroup, viewType: Int, position: Int): ItemViewHolder
 
@@ -252,20 +261,20 @@ abstract class BaseAdapter : RecyclerView.Adapter<BaseAdapter.BaseViewHolder>(),
         fun getItemView(): LinearLayout = itemView as LinearLayout
     }
 
-    private inner class ProcessTask : AsyncTask<Void, Void, List<LineInfo>>() {
+    private inner class ProcessTask : AsyncTask<Void, Void, List<GridLineInfo>>() {
         @SuppressLint("NotifyDataSetChanged")
-        override fun onPostExecute(items: List<LineInfo>) {
+        override fun onPostExecute(items: List<GridLineInfo>) {
             for (item in items) {
                 lines[itemCount] = item
             }
             notifyDataSetChanged()
         }
 
-        override fun doInBackground(vararg p0: Void?): List<LineInfo> {
-            val cache: MutableList<ItemInfo> = mutableListOf()
+        override fun doInBackground(vararg p0: Void?): List<GridLineInfo> {
+            val cache: MutableList<GridItemInfo> = mutableListOf()
             for (i in 0 until getRealItemCount()) {
                 try {
-                    cache.add(ItemInfo(i, getItem(i)))
+                    cache.add(GridItemInfo(i, getItem(i)))
                 } catch (e: CursorIndexOutOfBoundsException) {
                     e.printStackTrace()
                 }
@@ -283,7 +292,7 @@ abstract class BaseAdapter : RecyclerView.Adapter<BaseAdapter.BaseViewHolder>(),
 
     private inner class ViewState constructor(
         val viewType: Int,
-        val item: ItemInfo,
+        val item: GridItemInfo,
         val viewHolder: ItemViewHolder
     )
 }
