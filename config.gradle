@@ -65,5 +65,6 @@ ext {
             "mmkv"                     : "com.tencent:mmkv-static:$versions.mmkv",
 
             "autosize"                 : "me.jessyan:autosize:1.2.1",
+            "svga"                     : 'com.github.yyued:SVGAPlayer-Android:2.6.1',
     ]
 }

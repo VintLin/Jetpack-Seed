@@ -59,6 +59,7 @@ dependencies {
 
     api "$library.mmkv"
     api "$library.autosize"
+    api "$library.svga"
 }
 
 configurations.all {
