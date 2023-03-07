@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ProgressView">
+        <attr name="max" format="integer" />
+        <attr name="progress" format="float" />
+        <attr name="progressRadius" format="float" />
+        <attr name="borderSize" format="float" />
+        <attr name="zebraSize" format="float" />
+        <attr name="zebraGap" format="float" />
+    </declare-styleable>
+
+    <declare-styleable name="ShadowView">
+        <attr name="round_shadow_left_top" format="integer" />
+        <attr name="round_shadow_left_bottom" format="integer" />
+        <attr name="round_shadow_right_top" format="integer" />
+        <attr name="round_shadow_right_bottom" format="integer" />
+
+        <attr name="inner_shadow_x" format="integer" />
+        <attr name="inner_shadow_y" format="integer" />
+        <attr name="inner_shadow_blur" format="integer" />
+        <attr name="inner_shadow_expand" format="integer" />
+        <attr name="inner_shadow_color" format="color" />
+
+        <attr name="outer_shadow_x" format="integer" />
+        <attr name="outer_shadow_y" format="integer" />
+        <attr name="outer_shadow_blur" format="integer" />
+        <attr name="outer_shadow_expand" format="integer" />
+        <attr name="outer_shadow_color" format="color" />
+
+        <attr name="view_color" format="color" />
+    </declare-styleable>
+</resources>

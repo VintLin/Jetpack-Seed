@@ -10,4 +10,18 @@
     <color name="red">#f2100c</color>
     <color name="dark_red">#40000c</color>
     <color name="window_background">#FFF5F5F5</color>
+
+    <color name="download_progress_light">#88FFFFFF</color>-
+    <color name="download_progress_bg">#A2C3FF</color>
+    <color name="download_progress_zebra">#6CA0FF</color>
+    <color name="download_progress_border">#608BC1</color>
+    <color name="download_progress_error_bg">#FFC527</color>
+    <color name="download_progress_error_zebra">#FF900E</color>
+    <color name="download_progress_error_border">#BC500F</color>
+    <color name="download_box_bg">#89B732</color>
+    <color name="download_box_stroke">#5E8017</color>
+    <color name="download_box_border">#B3DF55</color>
+    <color name="download_retry_button_border">#B95711</color>
+    <color name="download_bubble_bg">#FFFEFC</color>
+    <color name="download_bubble_shadow">#F4D694</color>
 </resources>
